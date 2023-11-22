@@ -1,4 +1,3 @@
-using DBMigrationWebApi.Extenstions;
 using Domain.ApplicationUserAggregate;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,8 +13,7 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddScoped<IUserStore<ApplicationUser>/*, CustomUserStore*/>();
-builder.Services.ConfigureDbContext(builder.Configuration);
-builder.Services.ConfigureIdentityDbContext();
+
 
 //builder.Services.AddSingleton<LogFileService>();
 //builder.Services.AddScoped<BeeDegreeUOW>();
