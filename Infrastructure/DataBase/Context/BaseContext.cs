@@ -12,9 +12,22 @@ namespace Infrastructure.DataBase.Context
 {
     public class BaseContext : IdentityDbContext<ApplicationUser,ApplicationRole,string>
     {
-        public BaseContext(DbContextOptions<BaseContext> options) : base(options)
-        {
+        private readonly Tenant _tenant;
 
+        public BaseContext(DbContextOptions<BaseContext> options, IHttpContextAccessor httpContextAccessor)
+            : base(options)
+        {
+            _tenant = httpContextAccessor.HttpContext?.Items["Tenant"] as Tenant;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            if (_tenant != null)
+            {
+                modelBuilder.HasDefaultSchema(_tenant.Schema);
+            }
+
+            base.OnModelCreating(modelBuilder);
         }
         #region Tenant
         public DbSet<Tenant> Tenant { get; set; }

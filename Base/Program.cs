@@ -1,6 +1,7 @@
+using Base.Middleware;
 using Domain.ApplicationUserAggregate;
 using Infrastructure.DataBase.Context;
-using Infrastructure.Services.Authentication;
+using Infrastructure.Services.Tenant;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +16,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUserStore<ApplicationUser>>();
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
         .AddEntityFrameworkStores<BaseContext>()
         .AddDefaultTokenProviders();
@@ -23,6 +23,17 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 
 builder.Services.AddDbContext<BaseContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BaseConnection")));
+
+
+builder.Services.AddSingleton<ITenantService, TenantService>();
+builder.Services.AddHttpContextAccessor();
+
+//builder.Services.AddDbContext<BaseContext>(options =>
+//    options.UseSqlServer(
+//        builder.Configuration.GetConnectionString("BaseConnection"),
+//        x => x.MigrationsAssembly("Base")
+//    )
+//);
 
 
 //builder.Services.AddSingleton<LogFileService>();
@@ -33,6 +44,8 @@ var app = builder.Build();
 
 //var logger = app.Services.GetRequiredService<LogFileService>();
 //app.ConfigureExceptionHandler(logger);
+
+app.UseMiddleware<TenantMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,7 +63,8 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<BaseContext>();
+    var services = scope.ServiceProvider;
+    var dbContext = services.GetRequiredService<BaseContext>();
     dbContext.Database.Migrate();
 }
 

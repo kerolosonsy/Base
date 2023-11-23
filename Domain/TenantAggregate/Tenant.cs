@@ -8,5 +8,7 @@ namespace Domain.TenantAggregate
 {
     public class Tenant : ParentEntity
     {
+        public string Domain { get; set; }
+        public string Schema { get; set; }
     }
 }
