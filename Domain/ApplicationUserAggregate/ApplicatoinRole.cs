@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.ApplicationUserAggregate
 {
-    public class ApplicatoinRole : IdentityRole<string>
+    public class ApplicationRole : IdentityRole<string>
     {
     }
 }

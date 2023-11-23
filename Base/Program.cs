@@ -1,6 +1,10 @@
 using Domain.ApplicationUserAggregate;
+using Infrastructure.DataBase.Context;
 using Infrastructure.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +15,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IUserStore<ApplicationUser>/*, CustomUserStore*/>();
-;
+builder.Services.AddScoped<IUserStore<ApplicationUser>>();
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+        .AddEntityFrameworkStores<BaseContext>()
+        .AddDefaultTokenProviders();
+
+
+builder.Services.AddDbContext<BaseContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("BaseConnection")));
 
 
 //builder.Services.AddSingleton<LogFileService>();
@@ -37,5 +47,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BaseContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

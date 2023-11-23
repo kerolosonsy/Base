@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.DataBase.Context
 {
-    public class BaseContext : IdentityDbContext<ApplicationUser,ApplicatoinRole,string>
+    public class BaseContext : IdentityDbContext<ApplicationUser,ApplicationRole,string>
     {
         public BaseContext(DbContextOptions<BaseContext> options) : base(options)
         {
@@ -18,6 +18,7 @@ namespace Infrastructure.DataBase.Context
         }
         #region Tenant
         public DbSet<Tenant> Tenant { get; set; }
+        public DbSet<Tenant> Tenant1 { get; set; }
         #endregion
 
     }
